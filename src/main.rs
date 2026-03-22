@@ -1,9 +1,11 @@
 use bevy::prelude::*;
 
 use crate::crosshair::CrosshairPlugin;
+use crate::dev_ui::DevUIPlugin;
 use crate::shield::ShieldPlugin;
 
 mod crosshair;
+mod dev_ui;
 mod shield;
 
 fn main() {
@@ -17,6 +19,7 @@ fn main() {
                 ..default()
             }),
             ShieldPlugin,
+            DevUIPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)

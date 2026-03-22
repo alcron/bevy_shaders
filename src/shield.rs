@@ -1,33 +1,20 @@
 use bevy::{
-    feathers::{
-        FeathersPlugins,
-        controls::{SliderProps, slider},
-        dark_theme::create_dark_theme,
-        theme::{ThemeBackgroundColor, ThemedText, UiTheme},
-        tokens,
-    },
     image::{ImageAddressMode, ImageLoaderSettings, ImageSampler, ImageSamplerDescriptor},
     prelude::*,
     render::render_resource::AsBindGroup,
     shader::ShaderRef,
-    ui_widgets::{SliderPrecision, SliderStep, ValueChange, observe, slider_self_update},
 };
+
+use crate::dev_ui::{DevUIMessage, DevUISliderProps, Panel, labeled_slider};
 
 pub struct ShieldPlugin;
 
 impl Plugin for ShieldPlugin {
     fn build(&self, app: &mut App) {
-        app.add_plugins((MaterialPlugin::<CustomMaterial>::default(), FeathersPlugins))
-            .insert_resource(UiTheme(create_dark_theme()))
-            .add_systems(Startup, setup)
-            .add_observer(update_dev_ui);
+        app.add_plugins((MaterialPlugin::<CustomMaterial>::default()))
+            .add_systems(Startup, (setup, spawn_dev_sliders).chain())
+            .add_systems(Update, on_slider_change);
     }
-}
-
-#[derive(Component, PartialEq)]
-enum DevUI {
-    ShieldRadius,
-    ShieldColorIntensity,
 }
 
 #[derive(Asset, TypePath, AsBindGroup, Clone)]
@@ -59,6 +46,41 @@ impl Material for CustomMaterial {
     }
 }
 
+#[derive(Component, PartialEq)]
+enum DevControls {
+    ShieldRadius,
+    ColorIntensity,
+}
+
+fn spawn_dev_sliders(mut commands: Commands, q_panel: Query<Entity, With<Panel>>) {
+    let Ok(panel) = q_panel.single() else {
+        return;
+    };
+    commands.entity(panel).with_children(|parent| {
+        parent.spawn(labeled_slider(
+            "Shield radius",
+            DevUISliderProps {
+                value: 0.5,
+                min: 0.0,
+                max: 1.0,
+                step: 0.01,
+            },
+            DevControls::ShieldRadius,
+        ));
+        parent.spawn(labeled_slider(
+            "Color intensity",
+            DevUISliderProps {
+                value: 0.25,
+                min: 0.0,
+                max: 1.0,
+                step: 0.01,
+                ..default()
+            },
+            DevControls::ColorIntensity,
+        ));
+    });
+}
+
 fn setup(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
@@ -88,94 +110,23 @@ fn setup(
         Transform::from_xyz(0.0, 0.0, 0.0)
             .with_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2)),
     ));
-
-    // right side panel with slider
-    commands.spawn((
-        Node {
-            position_type: PositionType::Absolute,
-            right: Val::Px(0.0),
-            top: Val::Px(0.0),
-            width: Val::Px(150.0),
-            height: Val::Percent(100.0),
-            flex_direction: FlexDirection::Column,
-            margin: UiRect::bottom(Val::Auto),
-            padding: UiRect::all(Val::Px(10.0)),
-            row_gap: Val::Px(8.0),
-            ..default()
-        },
-        ThemeBackgroundColor(tokens::WINDOW_BG),
-        // Wraps in a child to prevent slider expanding to the full height of the panel
-        children![(
-            Node {
-                display: Display::Flex,
-                flex_direction: FlexDirection::Column,
-                row_gap: Val::Px(4.0),
-                ..default()
-            },
-            children![
-                (
-                    Text::new("Shield radius"),
-                    ThemedText,
-                    TextFont {
-                        font_size: 10.0,
-                        ..default()
-                    }
-                ),
-                (
-                    slider(
-                        SliderProps {
-                            value: 0.5,
-                            min: 0.0,
-                            max: 1.0
-                        },
-                        (SliderStep(0.1), SliderPrecision(2), DevUI::ShieldRadius)
-                    ),
-                    observe(slider_self_update),
-                ),
-                (
-                    Text::new("Shield color intensity"),
-                    ThemedText,
-                    TextFont {
-                        font_size: 10.0,
-                        ..default()
-                    }
-                ),
-                (
-                    slider(
-                        SliderProps {
-                            value: 0.5,
-                            min: 0.0,
-                            max: 1.0
-                        },
-                        (
-                            SliderStep(0.1),
-                            SliderPrecision(2),
-                            DevUI::ShieldColorIntensity
-                        )
-                    ),
-                    observe(slider_self_update),
-                ),
-            ],
-        )],
-    ));
 }
 
-fn update_dev_ui(
-    event: On<ValueChange<f32>>,
-    q_slider: Query<&DevUI>,
+// TODO: Think how to decouple this from dev ui and handle it in a more generic way, e.g. by sending messages with marker and applying them to all materials that have this uniform
+fn on_slider_change(
+    mut message_reader: MessageReader<DevUIMessage>,
+    q_controls: Query<&DevControls>,
     mut materials: ResMut<Assets<CustomMaterial>>,
-    q_material: Query<&MeshMaterial3d<CustomMaterial>>,
+    material: Single<&MeshMaterial3d<CustomMaterial>>,
 ) {
-    let Ok(dev_ui) = q_slider.get(event.source) else {
-        return;
-    };
-    for mat_handle in &q_material {
-        if let Some(mat) = materials.get_mut(mat_handle) {
-            match dev_ui {
-                DevUI::ShieldRadius => mat.shield_radius = event.value,
-                DevUI::ShieldColorIntensity => {
-                    mat.shield_color_intensity = (1.0 - event.value) / 2.0
-                }
+    for message in message_reader.read() {
+        let Ok(control) = q_controls.get(message.entity) else {
+            continue;
+        };
+        if let Some(mat) = materials.get_mut(&material.0) {
+            match control {
+                DevControls::ShieldRadius => mat.shield_radius = message.value,
+                DevControls::ColorIntensity => mat.shield_color_intensity = message.value,
             }
         }
     }
