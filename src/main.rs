@@ -1,8 +1,10 @@
 use bevy::prelude::*;
 
 use crate::crosshair::CrosshairPlugin;
+use crate::shield::ShieldPlugin;
 
 mod crosshair;
+mod shield;
 
 fn main() {
     App::new()
@@ -14,7 +16,7 @@ fn main() {
                 }),
                 ..default()
             }),
-            CrosshairPlugin,
+            ShieldPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)
