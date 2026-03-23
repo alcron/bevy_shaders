@@ -1,12 +1,14 @@
 use bevy::prelude::*;
 
-use crate::crosshair::CrosshairPlugin;
+// use crate::crosshair::CrosshairPlugin;
 use crate::dev_ui::DevUIPlugin;
-use crate::shield::ShieldPlugin;
+// use crate::shield::ShieldPlugin;
+use crate::uv::UVPlugin;
 
 mod crosshair;
 mod dev_ui;
 mod shield;
+mod uv;
 
 fn main() {
     App::new()
@@ -18,8 +20,9 @@ fn main() {
                 }),
                 ..default()
             }),
-            ShieldPlugin,
+            // ShieldPlugin,
             DevUIPlugin,
+            UVPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)
