@@ -10,6 +10,8 @@ use bevy::{
     ui_widgets::{SliderPrecision, SliderStep, ValueChange, observe, slider_self_update},
 };
 
+// TODO: Try implementation with passing observer whitch emits massage with specified in using place of shader (like dissolve) proper enum (like Progress, GradientProgress, etc) and value.
+// TODO: Make color picker widget
 pub struct DevUIPlugin;
 
 impl Plugin for DevUIPlugin {
