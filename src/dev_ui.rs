@@ -2,7 +2,7 @@ use bevy::{
     ecs::system::IntoObserverSystem,
     feathers::{
         FeathersPlugins,
-        controls::{ColorPlane, ColorSliderProps, SliderProps, color_plane, color_slider, slider},
+        controls::{ColorSliderProps, SliderProps, color_slider, slider},
         dark_theme::create_dark_theme,
         theme::{ThemeBackgroundColor, ThemedText, UiTheme},
         tokens,
