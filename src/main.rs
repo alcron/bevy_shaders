@@ -5,8 +5,10 @@ use crate::dev_ui::DevUIPlugin;
 // use crate::shield::ShieldPlugin;
 // use crate::uv::UVPlugin;
 // use crate::dissolve::DissolvePlugin;
+use crate::color_change::ColorChangePlugin;
 use crate::fire::FirePlugin;
 
+mod color_change;
 mod crosshair;
 mod dev_ui;
 mod dissolve;
@@ -29,7 +31,8 @@ fn main() {
             // ShieldPlugin,
             // UVPlugin,
             // DissolvePlugin,
-            FirePlugin,
+            // FirePlugin,
+            ColorChangePlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)

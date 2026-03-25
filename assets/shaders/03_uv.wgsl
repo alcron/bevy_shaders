@@ -53,7 +53,7 @@ fn fragment(
     // return vec4(piexled_texture);
     // *** 
 
-    // *** course colution
+    // *** course solution
     let pixel_size: u32 = 32;
     let pixel_uv = floor((mesh.uv * f32(pixel_size)) + 0.5) / f32(pixel_size);
     let piexled_texture = textureSample(material_texture, material_texture_sampler, pixel_uv);
