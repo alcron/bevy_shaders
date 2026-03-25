@@ -4,11 +4,13 @@ use bevy::prelude::*;
 use crate::dev_ui::DevUIPlugin;
 // use crate::shield::ShieldPlugin;
 // use crate::uv::UVPlugin;
-use crate::dissolve::DissolvePlugin;
+// use crate::dissolve::DissolvePlugin;
+use crate::fire::FirePlugin;
 
 mod crosshair;
 mod dev_ui;
 mod dissolve;
+mod fire;
 mod shield;
 mod uv;
 
@@ -26,7 +28,8 @@ fn main() {
             // CrosshairPlugin,
             // ShieldPlugin,
             // UVPlugin,
-            DissolvePlugin,
+            // DissolvePlugin,
+            FirePlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)

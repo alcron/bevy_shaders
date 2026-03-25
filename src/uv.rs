@@ -3,17 +3,17 @@ use bevy::{
     prelude::*,
     render::render_resource::AsBindGroup,
     shader::ShaderRef,
+    ui_widgets::ValueChange,
 };
 
-use crate::dev_ui::{DevUIMessage, DevUISliderProps, Panel, labeled_slider};
+use crate::dev_ui::{DevUISliderProps, Panel, labeled_slider};
 
 pub struct UVPlugin;
 
 impl Plugin for UVPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins((MaterialPlugin::<CustomMaterial>::default()))
-            .add_systems(Startup, (setup, spawn_dev_sliders).chain())
-            .add_systems(Update, on_slider_change);
+            .add_systems(Startup, (setup, spawn_dev_sliders).chain());
     }
 }
 
@@ -39,11 +39,6 @@ impl Material for CustomMaterial {
     }
 }
 
-#[derive(Component, PartialEq)]
-enum DevControls {
-    X,
-}
-
 fn spawn_dev_sliders(mut commands: Commands, q_panel: Query<Entity, With<Panel>>) {
     let Ok(panel) = q_panel.single() else {
         return;
@@ -57,7 +52,13 @@ fn spawn_dev_sliders(mut commands: Commands, q_panel: Query<Entity, With<Panel>>
                 max: 1.0,
                 step: 0.01,
             },
-            DevControls::X,
+            |event: On<ValueChange<f32>>,
+             mut materials: ResMut<Assets<CustomMaterial>>,
+             material: Single<&MeshMaterial3d<CustomMaterial>>| {
+                if let Some(mat) = materials.get_mut(&material.0) {
+                    mat.x = event.value;
+                }
+            },
         ));
     });
 }
@@ -81,23 +82,4 @@ fn setup(
         Transform::from_xyz(0.0, 0.0, 0.0)
             .with_rotation(Quat::from_rotation_x(std::f32::consts::FRAC_PI_2)),
     ));
-}
-
-// TODO: Think how to decouple this from dev ui and handle it in a more generic way, e.g. by sending messages with marker and applying them to all materials that have this uniform
-fn on_slider_change(
-    mut message_reader: MessageReader<DevUIMessage>,
-    q_controls: Query<&DevControls>,
-    mut materials: ResMut<Assets<CustomMaterial>>,
-    material: Single<&MeshMaterial3d<CustomMaterial>>,
-) {
-    for message in message_reader.read() {
-        let Ok(control) = q_controls.get(message.entity) else {
-            continue;
-        };
-        if let Some(mat) = materials.get_mut(&material.0) {
-            match control {
-                DevControls::X => mat.x = message.value,
-            }
-        }
-    }
 }

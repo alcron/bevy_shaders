@@ -1,7 +1,8 @@
 use bevy::{
+    ecs::system::IntoObserverSystem,
     feathers::{
         FeathersPlugins,
-        controls::{SliderProps, slider},
+        controls::{ColorPlane, ColorSliderProps, SliderProps, color_plane, color_slider, slider},
         dark_theme::create_dark_theme,
         theme::{ThemeBackgroundColor, ThemedText, UiTheme},
         tokens,
@@ -9,6 +10,8 @@ use bevy::{
     prelude::*,
     ui_widgets::{SliderPrecision, SliderStep, ValueChange, observe, slider_self_update},
 };
+
+pub use bevy::feathers::controls::ColorChannel;
 
 // TODO: Try implementation with passing observer whitch emits massage with specified in using place of shader (like dissolve) proper enum (like Progress, GradientProgress, etc) and value.
 // TODO: Make color picker widget
@@ -18,19 +21,12 @@ impl Plugin for DevUIPlugin {
     fn build(&self, app: &mut App) {
         app.add_plugins(FeathersPlugins)
             .insert_resource(UiTheme(create_dark_theme()))
-            .add_message::<DevUIMessage>()
             .add_systems(Startup, setup);
     }
 }
 
 #[derive(Component)]
 pub struct Panel;
-
-#[derive(Message)]
-pub struct DevUIMessage {
-    pub entity: Entity,
-    pub value: f32,
-}
 
 #[derive(Default)]
 pub struct DevUISliderProps {
@@ -40,7 +36,11 @@ pub struct DevUISliderProps {
     pub step: f32,
 }
 
-pub fn labeled_slider(label: &str, props: DevUISliderProps, extra: impl Bundle) -> impl Bundle {
+pub fn labeled_slider<M: Send + Sync + 'static>(
+    label: &str,
+    props: DevUISliderProps,
+    callback: impl IntoObserverSystem<ValueChange<f32>, (), M> + Send + Sync,
+) -> impl Bundle {
     (
         Node {
             display: Display::Flex,
@@ -64,20 +64,49 @@ pub fn labeled_slider(label: &str, props: DevUISliderProps, extra: impl Bundle) 
                         min: props.min,
                         max: props.max
                     },
-                    (SliderStep(props.step), SliderPrecision(2), extra)
+                    (SliderStep(props.step), SliderPrecision(2))
                 ),
                 observe(slider_self_update),
-                observe(on_slider_change),
+                observe(callback),
             ),
         ],
     )
 }
 
-fn on_slider_change(event: On<ValueChange<f32>>, mut mw: MessageWriter<DevUIMessage>) {
-    mw.write(DevUIMessage {
-        entity: event.source,
-        value: event.value,
-    });
+pub fn labeled_color_slider<M: Send + Sync + 'static>(
+    label: &str,
+    channel: ColorChannel,
+    callback: impl IntoObserverSystem<ValueChange<f32>, (), M> + Send + Sync,
+) -> impl Bundle {
+    (
+        Node {
+            display: Display::Flex,
+            flex_direction: FlexDirection::Column,
+            row_gap: Val::Px(4.0),
+            ..default()
+        },
+        children![
+            (
+                Text::new(label.to_string()),
+                ThemedText,
+                TextFont {
+                    font_size: 10.0,
+                    ..default()
+                }
+            ),
+            (
+                color_slider(
+                    ColorSliderProps {
+                        value: 0.5,
+                        channel,
+                    },
+                    (),
+                ),
+                observe(slider_self_update),
+                observe(callback),
+            ),
+        ],
+    )
 }
 
 fn setup(mut commands: Commands) {
