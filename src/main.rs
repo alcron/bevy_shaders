@@ -9,7 +9,8 @@ use crate::dev_ui::DevUIPlugin;
 // use crate::fire::FirePlugin;
 // use crate::randomness::RandomnessPlugin;
 // use crate::frame_animation::FrameAnimationPlugin;
-use crate::oribit::OrbitPlugin;
+// use crate::oribit::OrbitPlugin;
+use crate::shine::ShinePlugin;
 
 // mod color_change;
 // mod crosshair;
@@ -20,7 +21,8 @@ mod dev_ui;
 // mod randomness;
 // mod shield;
 // mod uv;
-mod oribit;
+// mod oribit;
+mod shine;
 
 fn main() {
     App::new()
@@ -41,7 +43,8 @@ fn main() {
             // ColorChangePlugin,
             // RandomnessPlugin,
             // FrameAnimationPlugin,
-            OrbitPlugin,
+            // OrbitPlugin,
+            ShinePlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)
