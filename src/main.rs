@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use bevy_tweening::TweeningPlugin;
 
 // use crate::crosshair::CrosshairPlugin;
 use crate::dev_ui::DevUIPlugin;
@@ -11,7 +12,8 @@ use crate::dev_ui::DevUIPlugin;
 // use crate::frame_animation::FrameAnimationPlugin;
 // use crate::oribit::OrbitPlugin;
 // use crate::shine::ShinePlugin;
-use crate::reload::ReloadPlugin;
+// use crate::reload::ReloadPlugin;
+use crate::stamina::StaminaPlugin;
 
 // mod color_change;
 // mod crosshair;
@@ -24,7 +26,8 @@ mod dev_ui;
 // mod uv;
 // mod oribit;
 // mod shine;
-mod reload;
+// mod reload;
+mod stamina;
 
 fn main() {
     App::new()
@@ -36,6 +39,7 @@ fn main() {
                 }),
                 ..default()
             }),
+            TweeningPlugin,
             DevUIPlugin,
             // CrosshairPlugin,
             // ShieldPlugin,
@@ -47,7 +51,8 @@ fn main() {
             // FrameAnimationPlugin,
             // OrbitPlugin,
             // ShinePlugin,
-            ReloadPlugin,
+            // ReloadPlugin,
+            StaminaPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)
