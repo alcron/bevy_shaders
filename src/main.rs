@@ -13,7 +13,8 @@ use crate::dev_ui::DevUIPlugin;
 // use crate::oribit::OrbitPlugin;
 // use crate::shine::ShinePlugin;
 // use crate::reload::ReloadPlugin;
-use crate::stamina::StaminaPlugin;
+// use crate::stamina::StaminaPlugin;
+use crate::liquid::LiquidPlugin;
 
 // mod color_change;
 // mod crosshair;
@@ -27,7 +28,8 @@ mod dev_ui;
 // mod oribit;
 // mod shine;
 // mod reload;
-mod stamina;
+// mod stamina;
+mod liquid;
 
 fn main() {
     App::new()
@@ -52,7 +54,8 @@ fn main() {
             // OrbitPlugin,
             // ShinePlugin,
             // ReloadPlugin,
-            StaminaPlugin,
+            // StaminaPlugin,
+            LiquidPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)
