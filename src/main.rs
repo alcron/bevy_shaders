@@ -16,7 +16,8 @@ use crate::dev_ui::DevUIPlugin;
 // use crate::stamina::StaminaPlugin;
 // use crate::liquid::LiquidPlugin;
 // use crate::flag::FlagPlugin;
-use crate::matrix::MatrixPlugin;
+// use crate::matrix::MatrixPlugin;
+use crate::fake_3d::Fake3DPlugin;
 
 // mod color_change;
 // mod crosshair;
@@ -33,7 +34,8 @@ mod dev_ui;
 // mod stamina;
 // mod liquid;
 // mod flag;
-mod matrix;
+// mod matrix;
+mod fake_3d;
 
 fn main() {
     App::new()
@@ -61,7 +63,8 @@ fn main() {
             // StaminaPlugin,
             // LiquidPlugin,
             // FlagPlugin,
-            MatrixPlugin,
+            // MatrixPlugin,
+            Fake3DPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)

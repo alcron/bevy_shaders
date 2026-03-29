@@ -14,6 +14,7 @@
 const PI: f32 = acos(-1.0);
 
 // TODO: Better orient plane for easier matrix transformation. Currently it's oriented in xy plane, so we need to apply offset to z axis and rotate around y axis to make it look like it's in xz plane
+// upd: oriented correctly check why doesn't work as intended
 @vertex
 fn vertex(
     vertex: Vertex,
