@@ -18,7 +18,8 @@ use crate::dev_ui::DevUIPlugin;
 // use crate::flag::FlagPlugin;
 // use crate::matrix::MatrixPlugin;
 // use crate::fake_3d::Fake3DPlugin;
-use crate::model::ModelPlugin;
+// use crate::model::ModelPlugin;
+use crate::dungeon_lights::DungeonLightsPlugin;
 
 // mod color_change;
 // mod crosshair;
@@ -37,7 +38,8 @@ mod dev_ui;
 // mod flag;
 // mod matrix;
 // mod fake_3d;
-mod model;
+// mod model;
+mod dungeon_lights;
 
 fn main() {
     App::new()
@@ -67,7 +69,8 @@ fn main() {
             // FlagPlugin,
             // MatrixPlugin,
             // Fake3DPlugin,
-            ModelPlugin,
+            // ModelPlugin,
+            DungeonLightsPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)
