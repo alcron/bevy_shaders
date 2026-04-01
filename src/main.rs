@@ -22,7 +22,8 @@ use crate::dev_ui::DevUIPlugin;
 // use crate::dungeon_lights::DungeonLightsPlugin;
 // use crate::grass::GrassPlugin;
 // use canvas_into::CanvasIntroPlugin;
-use magnify::MagnifyPlugin;
+// use magnify::MagnifyPlugin;
+use tv::TVPlugin;
 
 // mod color_change;
 // mod crosshair;
@@ -45,7 +46,8 @@ mod dev_ui;
 // mod dungeon_lights;
 // mod grass;
 // mod canvas_into;
-mod magnify;
+// mod magnify;
+mod tv;
 
 fn main() {
     App::new()
@@ -79,7 +81,8 @@ fn main() {
             // DungeonLightsPlugin,
             // GrassPlugin,
             // CanvasIntroPlugin,
-            MagnifyPlugin,
+            // MagnifyPlugin,
+            TVPlugin,
         ))
         .add_systems(Startup, setup)
         .add_systems(Update, close_on_esc)
